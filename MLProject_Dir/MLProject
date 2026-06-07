@@ -1,6 +1,6 @@
 name: Telco_Churn_Prediction
 
-conda_env: conda.yaml
+conda_env: conda.yml
 
 entry_points:
   main:

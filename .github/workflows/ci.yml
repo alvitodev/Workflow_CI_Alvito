@@ -26,6 +26,7 @@ jobs:
       - name: Run MLflow Project
         run: |
           cd MLProject_Dir
+          rm -rf mlruns/
           mlflow run . --env-manager=local
 
       - name: Build Docker Image using MLflow

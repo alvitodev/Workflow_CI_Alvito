@@ -32,12 +32,18 @@ jobs:
       - name: Build Docker Image using MLflow
         run: |
           cd MLProject_Dir
-          # Mengambil ID Run dari hasil training barusan
           RUN_ID=$(ls mlruns/0 | grep -v meta.yaml | head -n 1)
           echo "Run ID yang didapat: $RUN_ID"
           
-          # Membangun Docker Image menggunakan fitur bawaan MLflow
-          mlflow models build-docker -m mlruns/0/$RUN_ID/artifacts/model -n ${{ secrets.DOCKER_USERNAME }}/telco-model:latest
+          # 1. Ekstrak Dockerfile (Pengganti sementara untuk 'mlflow models build-docker' yang nge-bug)
+          mlflow models generate-dockerfile -m mlruns/0/$RUN_ID/artifacts/model -d docker_build_dir
+          
+          # 2. [PATCH] Perbaiki URL get-pip.py yang error ke versi arsip khusus Python 3.9
+          sed -i 's|https://bootstrap.pypa.io/get-pip.py|https://bootstrap.pypa.io/pip/3.9/get-pip.py|g' docker_build_dir/Dockerfile
+          
+          # 3. Build Docker Image
+          cd docker_build_dir
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/telco-model:latest .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3

@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -24,7 +24,6 @@ jobs:
           pip install mlflow==2.19.0 pandas scikit-learn
 
       - name: Run MLflow Project
-        # oake env-manager=local agar server github tidak keberatan instalasi Conda
         run: |
           cd MLProject_Dir
           mlflow run . --env-manager=local
@@ -40,7 +39,7 @@ jobs:
           mlflow models build-docker -m mlruns/0/$RUN_ID/artifacts/model -n ${{ secrets.DOCKER_USERNAME }}/telco-model:latest
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -50,7 +49,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/telco-model:latest
 
       - name: Upload Artifacts to GitHub (Save to Repository)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mlflow-artifacts
           path: MLProject_Dir/mlruns/
